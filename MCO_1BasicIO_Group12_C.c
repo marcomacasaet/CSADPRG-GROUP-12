@@ -1,3 +1,10 @@
+/*
+********************
+Last names: Acosta, Bunggo, Gregorio, Macasaet
+Language: C
+Paradigm(s): Procedural, Imperative
+********************
+*/
 #include <stdio.h>
 #include <string.h>
 

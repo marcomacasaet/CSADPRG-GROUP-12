@@ -1,8 +1,8 @@
 /*
 ********************
-Last names:
-Language:
-Paradigm(s):
+Last names: Acosta, Bunggo, Gregorio, Macasaet
+Language: Kotlin
+Paradigm(s): Object-Oriented, Functional, Imperative
 ********************
 */
 
