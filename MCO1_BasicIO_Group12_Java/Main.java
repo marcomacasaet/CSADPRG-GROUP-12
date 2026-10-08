@@ -2,7 +2,7 @@
 ********************
 Last names: Acosta, Bunggo, Gregorio, Macasaet
 Language: Java
-Paradigm(s):
+Paradigm(s): Object-oriented, Imperative
 ********************
 */
 
