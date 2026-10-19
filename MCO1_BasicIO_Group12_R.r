@@ -3,29 +3,145 @@
 #Language: R
 #Paradigm(s): Object-Oriented, Functional, Vector oriented
 #********************
-regis_account <- function() {
-  pangalan <- readline(prompt = "Account Name: ")
-  cat("\n***\nAccount Name = ", pangalan, "\n")
+
+#  [1] Register Account Name - REQ-0009
+#  [2] Deposit Amount        - REQ-0004, 0008
+#  [3] Withdraw Amount       - REQ-0005, s0008
+#  [4] Currency Exchange     - REQ-0002, 0003
+#  [5] Record Exchange Rates - REQ-0001
+#  [6] Show Interest Amount -  REQ-006(UNFIN), 0007(UNFIN)
+
+oo_o_hinde <- function() {
+  repeat {
+    tanong <- toupper(trimws(readline(prompt = "\nBack to the Main Menu (Y/N): ")))
+    if (tanong == "Y") {
+      return(TRUE)
+    } else if (tanong == "N") {
+      return(FALSE)
+    } else {
+      cat("Please enter Y or N\n")
+    }
+  }
 }
 
-deposit <- function(curr_bal, curr) {
-  pangalan <- readline(prompt = "Account Name: ")
-  cat("Current Balance: ", curr_bal, "\nCurrency: ", curr)
-  deposit_amount <- readline(prompt = "\n\nDeposit Amount: ")
-  deposit_amount <- as.numeric(deposit_amount)
-  cat("\n***\nAccount Name = ", pangalan, "\nDeposit Amount: ", deposit_amount)
-  cat("\n")
-  list(pangalan = pangalan, deposit_amount = deposit_amount)
+papalit_o_hinde <- function() {
+  repeat {
+    tanong <- toupper(trimws(readline(prompt = "\nConvert another currency (Y/N)? ")))
+    if (tanong == "Y") {
+      return(TRUE)
+    } else if (tanong == "N") {
+      return(FALSE)
+    } else {
+      cat("Please enter Y or N\n")
+    }
+  }
 }
 
-withdraw <- function(curr_bal, curr) {
-  pangalan <- readline(prompt = "Account Name: ")
-  cat("Current Balance: ", curr_bal, "\nCurrency: ", curr)
-  withdraw_amount <- readline(prompt = "\n\nWithdraw Amount: ")
-  withdraw_amount <- as.numeric(withdraw_amount)
-  cat("\n***\nAccount Name = ", pangalan, "\nDeposit Amount: ", withdraw_amount)
-  cat("\n")
-  list(pangalan = pangalan, deposit_amount = withdraw_amount)
+regis_account <- function(account) {
+  pangalan <- trimws(readline(prompt = "Account Name: "))
+
+  if (pangalan == "") {
+    cat("Name cannot be empty\n")
+    return(account)
+  }
+  account$pangalan <- pangalan
+  cat("\n***\nAccount Name = ", account$pangalan, "\n")
+  account
+}
+
+deposit <- function(account, currency_list) {
+  if (is.null(account$pangalan)) {
+    cat("Please register an account first\n")
+    return(account)
+  }
+
+  pangalan_local <- trimws(readline(prompt = "Account Name: "))
+  if (pangalan_local != account$pangalan) {
+    cat("Account name does not match\n")
+    return(account)
+  }
+
+  cat("Base Currency: PHP\n")
+  cat("Current Balance:", sprintf("%.2f", account$balance), "\n")
+  cat("Currency:", account$currency, "\n\n")
+
+  cat("Currency Option:\n")
+  cat("[1] Philippine Peso (PHP)\n")
+  cat("[2] United States Dollar (USD)\n")
+  cat("[3] Japanese Yen (JPY)\n")
+  cat("[4] British Pound Sterling (GBP)\n")
+  cat("[5] Euro (EUR)\n")
+  cat("[6] Chinese Yuan Renminni (CNY)\n")
+  pili_currency <- as.integer(readline(prompt = "Select Currency: "))
+  if (is.na(pili_currency) || pili_currency < 1 || pili_currency > 6) {
+    cat("Invalid currency\n")
+    return(account)
+  }
+
+  deposit_amount <- as.numeric(readline(prompt = "Deposit Amount: "))
+  if (is.na(deposit_amount) || deposit_amount <= 0) {
+    cat("Invalid amount\n")
+    return(account)
+  }
+
+  php_amount <- deposit_amount * currency_list[[pili_currency]]
+  account$balance <- account$balance + php_amount
+
+  cat("\n***\nAccount Name =", account$pangalan, "\n")
+  cat(sprintf("Deposit Amount: %.2f %s (%.2f PHP)\n", deposit_amount, names(currency_list)[pili_currency], php_amount))
+  cat("Currency:", account$currency, "\n")
+  cat(sprintf("Updated Balance: %.2f\n", account$balance))
+  account
+}
+
+withdraw <- function(account, currency_list) {
+  if (is.null(account$pangalan)) {
+    cat("Please register an account first\n")
+    return(account)
+  }
+
+  pangalan_local <- trimws(readline(prompt = "Account Name: "))
+  if (pangalan_local != account$pangalan) {
+    cat("Account name does not match\n")
+    return(account)
+  }
+
+  cat("Base Currency: PHP\n")
+  cat("Current Balance:", sprintf("%.2f", account$balance), "\n")
+  cat("Currency:", account$currency, "\n\n")
+
+  cat("Currency Option:\n")
+  cat("[1] Philippine Peso (PHP)\n")
+  cat("[2] United States Dollar (USD)\n")
+  cat("[3] Japanese Yen (JPY)\n")
+  cat("[4] British Pound Sterling (GBP)\n")
+  cat("[5] Euro (EUR)\n")
+  cat("[6] Chinese Yuan Renminni (CNY)\n")
+  pili_currency <- as.integer(readline(prompt = "Select Currency: "))
+  if (is.na(pili_currency) || pili_currency < 1 || pili_currency > 6) {
+    cat("Invalid currency\n")
+    return(account)
+  }
+
+  withdraw_amount <- as.numeric(readline(prompt = "Withdraw Amount: "))
+  if (is.na(withdraw_amount) || withdraw_amount <= 0) {
+    cat("Invalid amount\n")
+    return(account)
+  }
+
+  php_amount <- withdraw_amount * currency_list[[pili_currency]]
+  if (php_amount > account$balance) {
+    cat("Insufficient balance\n")
+    return(account)
+  }
+
+  account$balance <- account$balance - php_amount
+
+  cat("\n***\nAccount Name =", account$pangalan, "\n")
+  cat(sprintf("Withdraw Amount: %.2f %s (%.2f PHP)\n", withdraw_amount, names(currency_list)[pili_currency], php_amount))
+  cat("Currency:", account$currency, "\n")
+  cat(sprintf("Updated Balance: %.2f\n", account$balance))
+  account
 }
 
 record_exc_rate <- function(currency_list) {
@@ -36,38 +152,108 @@ record_exc_rate <- function(currency_list) {
   cat("[5] Euro (EUR)\n")
   cat("[6] Chinese Yuan Renminni (CNY)\n")
   pili_currency <- as.integer(readline(prompt = "Select Foreign Currency: "))
-  bagong_rate <- as.numeric(readline(prompt = "Exchange Rate: "))
-
-  if (!is.na(pili_currency) && pili_currency >= 1 && pili_currency <= 6){
-    currency_list[[pili_currency]] <- bagong_rate
-    cat("\n***\nSelect Foreign Currency: ", pili_currency)
-    cat("\nExchange Rate: ", bagong_rate, "\n")
-  }else{
-    cat("Invalid input")
+  if (is.na(pili_currency) || pili_currency < 1 || pili_currency > 6) {
+    cat("Invalid currency\n")
+    return(currency_list)
   }
+  if (pili_currency == 1) {
+    cat("PHP is the base currency thus its rate cannot be changed\n")
+    return(currency_list)
+  }
+
+  bagong_rate <- as.numeric(readline(prompt = "Exchange Rate: "))
+  if (is.na(bagong_rate) || bagong_rate <= 0) {
+    cat("Invalid rate\n")
+    return(currency_list)
+  }
+
+  currency_list[[pili_currency]] <- bagong_rate
+  cat("\n***\n")
+  cat("Currency:", names(currency_list)[pili_currency], "\n")
+  cat(sprintf("Exchange Rate: %.2f\n", bagong_rate))
   currency_list
 }
 
 curr_exc <- function(currency_list) {
+  cat("Source Currency Option:\n")
+  cat("[1] Philippine Peso (PHP)\n")
+  cat("[2] United States Dollar (USD)\n")
+  cat("[3] Japanese Yen (JPY)\n")
+  cat("[4] British Pound Sterling (GBP)\n")
+  cat("[5] Euro (EUR)\n")
+  cat("[6] Chinese Yuan Renminni (CNY)\n")
+
+  source_currency <- as.integer(readline(prompt = "Source Currency: "))
+  if (is.na(source_currency) || source_currency < 1 || source_currency > 6) {
+    cat("Invalid currency\n")
+    return()
+  }
+
   source_amount <- as.numeric(readline(prompt = "Source Amount (PHP): "))
-  cat("\n\nExchanged Currency\n")
-  cat("[1] Philippine Peso (PHP) = ", source_amount * currency_list[[1]], "\n")
-  cat("[2] United States Dollar (USD) = ", source_amount * currency_list[[2]], "\n")
-  cat("[3] Japanese Yen (JPY) = ", source_amount * currency_list[[3]], "\n")
-  cat("[4] British Pound Sterling (GBP) = ", source_amount * currency_list[[4]], "\n")
-  cat("[5] Euro (EUR) = ", source_amount * currency_list[[5]], "\n")
-  cat("[6] Chinese Yuan Renminni (CNY) = ", source_amount * currency_list[[6]], "\n")
-  cat("\n***\nSource Currency = Philippine Peso (PHP)\n")
-  cat("Source Amount (PHP) = ", source_amount, "\n")
+  if (is.na(source_amount) || source_amount <= 0) {
+    cat("Invalid amount\n")
+    return(invisible(NULL))
+  }
+
+  cat("\n\nExchanged Currency Options:\n")
+  cat("[1] Philippine Peso (PHP)\n")
+  cat("[2] United States Dollar (USD)\n")
+  cat("[3] Japanese Yen (JPY)\n")
+  cat("[4] British Pound Sterling (GBP)\n")
+  cat("[5] Euro (EUR)\n")
+  cat("[6] Chinese Yuan Renminni (CNY)\n")
+  exchange_currency <- as.integer(readline(prompt = "\nExchange Currency: "))
+  if (is.na(exchange_currency) || exchange_currency < 1 || exchange_currency > 6) {
+    cat("Invalid currency\n")
+    return()
+  }
+  exchange_amount <- source_amount * currency_list[[source_currency]] / currency_list[[exchange_currency]]
+  cat(sprintf("Exchange Amount: %.2f\n", exchange_amount))
 }
 
-disp_interest_amnt <- function() {
-  cat("Currenty under construction....\n")
+disp_interest_amnt <- function(account) {
+  if (is.null(account$pangalan)) {
+    cat("Please register an account first\n")
+    return(account)
+  }
+
+  pangalan_local <- trimws(readline(prompt = "Account Name: "))
+  if (pangalan_local != account$pangalan) {
+    cat("Account name does not match\n")
+    return(account)
+  }
+
+  cat("Current Balance: ", account$balance, "\nCurrency: ", account$currency)
+  cat("\nCurrent Interest Rate: 5%\n")
+
+  interest_araw <- readline(prompt = "\n\nTotal Number of Days: ")
+  hiwa <- strsplit(trimws(interest_araw), " ")[[1]]
+  interest_araw <- as.integer(hiwa[1])
+
+  if (is.na(interest_araw) || interest_araw <= 0) {
+    cat("Invalid number of days\n")
+    return(account)
+  }
+  int_rate <- 0.05
+  bal <- account$balance
+
+  cat("\nDay | Interest | Balance |\n")
+  for (araw in 1:interest_araw) {
+    interest <- round(bal * int_rate / 365, 2)
+    bal <- bal + interest
+    cat(sprintf("%-3d | %-8.2f | %-7.2f |\n", araw, interest, bal))
+  }
+  account
 }
 
+#=============================================================
+# MAIN LOOP
 buhay_pa <- TRUE
-curr_bal <- 1000.00
-curr <- "PHP"
+account <- list(
+  pangalan = NULL,
+  balance = 0.00,
+  currency = "PHP"
+)
 currency_list <- list(PHP = 1.00, USD = 62.00,
                       JPY = 0.40, GBP = 84.00,
                       EUR = 72.00, CNY = 9.00)
@@ -80,41 +266,56 @@ while (buhay_pa) {
   cat("[5] Record Exchange Rates\n")
   cat("[6] Show Interest Amount\n")
   cat("[7] Exit\n")
-  pili_ka <- readline(prompt = "\nChoice: ")
+  pili_ka <- trimws(readline(prompt = "\nChoice: "))
   cat("\n***\nChoice =", pili_ka, "\n\n")
-  switch(pili_ka,
+    switch(pili_ka,
          "1" = {
-           cat("Register Account Name\n")
-           pangalan <- regis_account()
+           repeat {
+             cat("Register Account Name\n")
+             account <- regis_account(account)
+             if (oo_o_hinde()) break
+           }
          },
          "2" = {
-           cat("Deposit Amount\n")
-           listahan <- deposit(curr_bal, curr)
-           #To access: listahan$pangalan / listahan$deposit_amount
+           repeat {
+             cat("Deposit Amount\n")
+             account <- deposit(account, currency_list)
+             if (oo_o_hinde()) break
+           }
          },
          "3" = {
-           cat("Withdraw Amount\n")
-           listahan <- withdraw(curr_bal, curr)
-           #To access: listahan$pangalan / listahan$withdraw_amount
+           repeat {
+             cat("Withdraw Amount\n")
+             account <- withdraw(account, currency_list)
+             if (oo_o_hinde()) break
+           }
          },
          "4" = {
-           cat("Foreign Currency Exchange\n")
-           curr_exc(currency_list)
+           repeat {
+             cat("Foreign Currency Exchange\n")
+             curr_exc(currency_list)
+             if (!papalit_o_hinde()) break
+           }
          },
          "5" = {
-           cat("Record Exchange Rate\n\n")
-           currency_list <- record_exc_rate(currency_list)
+           repeat {
+             cat("Record Exchange Rate\n\n")
+             currency_list <- record_exc_rate(currency_list)
+             if (oo_o_hinde()) break
+           }
          },
          "6" = {
-           cat("Show Interest Amount\n")
-           disp_interest_amnt()
+           repeat {
+             cat("Show Interest Amount\n")
+             account <- disp_interest_amnt(account)
+             if (oo_o_hinde()) break
+           }
          },
          "7" = {
            cat("Terminating program....\n")
            buhay_pa <- FALSE
          },
          {
-           cat("Wrong input! Please use integers 1-6 only!\n")
-           buhay_pa <- FALSE
+           cat("Wrong input! Please use integers 1-7 only!\n")
          })
 }
