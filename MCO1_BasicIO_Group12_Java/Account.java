@@ -5,6 +5,7 @@ public class Account{
     //String exRate;
     //Currency accCurrencyEx = new Currency();
     String accCurrency = "PHP";
+    Interest interest = new Interest(0.05, 0);
 
     Account(String name){
         this.name = name;
@@ -35,4 +36,10 @@ public class Account{
     public String getAccCurrency(){
         return this.accCurrency;
     }
+
+    public Interest getInterest(){
+        return this.interest;
+    }
+
+    
 }
