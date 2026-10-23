@@ -6,10 +6,10 @@
 
 #  [1] Register Account Name - REQ-0009
 #  [2] Deposit Amount        - REQ-0004, 0008
-#  [3] Withdraw Amount       - REQ-0005, s0008
+#  [3] Withdraw Amount       - REQ-0005, 0008
 #  [4] Currency Exchange     - REQ-0002, 0003
 #  [5] Record Exchange Rates - REQ-0001
-#  [6] Show Interest Amount -  REQ-006(UNFIN), 0007(UNFIN)
+#  [6] Show Interest Amount -  REQ-006, 0007
 
 oo_o_hinde <- function() {
   repeat {
@@ -84,7 +84,7 @@ deposit <- function(account, currency_list) {
     return(account)
   }
 
-  php_amount <- deposit_amount * currency_list[[pili_currency]]
+  php_amount <- round(deposit_amount * currency_list[[pili_currency]], 2)
   account$balance <- account$balance + php_amount
 
   cat("\n***\nAccount Name =", account$pangalan, "\n")
@@ -129,7 +129,7 @@ withdraw <- function(account, currency_list) {
     return(account)
   }
 
-  php_amount <- withdraw_amount * currency_list[[pili_currency]]
+  round(deposit_amount * currency_list[[pili_currency]], 2)
   if (php_amount > account$balance) {
     cat("Insufficient balance\n")
     return(account)
@@ -189,7 +189,7 @@ curr_exc <- function(currency_list) {
     return()
   }
 
-  source_amount <- as.numeric(readline(prompt = "Source Amount (PHP): "))
+  source_amount <- as.numeric(readline(prompt = "Source Amount: "))
   if (is.na(source_amount) || source_amount <= 0) {
     cat("Invalid amount\n")
     return(invisible(NULL))
