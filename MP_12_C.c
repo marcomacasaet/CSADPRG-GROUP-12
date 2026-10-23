@@ -13,6 +13,7 @@ struct Account {
     char firstName[200];
     float balance;
     char currency[4];
+    float interestRate;
 };
 
 struct exchangeRate {
@@ -42,44 +43,113 @@ void menuPrint () {
     printf("[3] Withdraw Amount\n");
     printf("[4] Currency Exchange\n");
     printf("[5] Record Exchange Rates\n");
-    printf("[6] Show Interest Amount\n\n");
+    printf("[6] Show Interest Amount\n");
+    printf("[7] Exit\n\n");
 }
 
 void accountRegister(struct Account *account) {
     printf("Register Account Name\n");
     printf("Account Name: ");
     scanf("%199[^,], %199[^\n]", account->lastName, account->firstName);
-    printf("Account Name: %s, %s\n", account->lastName, account->firstName);
+    printf("\n\nAccount Name: %s, %s\n", account->lastName, account->firstName);
     account->balance = 1000.0;
     strcpy(account->currency, "PHP");
+    printf("Initial Balance: %.2f\n", account->balance);
+    printf("Currency: %s\n\n", account->currency);
 }
 
-void depositAmount(struct Account *account) {
+void changeAccountCurrency(struct Account *account, struct exchangeRate *rate, int currency) {
+    float newBalance;
+    printf("\n\nCurrent currency: %s\n\n", account->currency);
+
+    if (strcmp(account->currency, rate[currency-1].currency) == 0) {
+        printf("The account is already in %s currency.\n\n", account->currency);
+        return;
+    }
+
+    float currentRate = 1.00; 
+    for (int i = 0; i < 6; i++) {
+        if (strcmp(account->currency, rate[i].currency) == 0) {
+            currentRate = rate[i].rate;
+            break;
+        }
+    }
+
+    
+    newBalance = account->balance * (currentRate / rate[currency-1].rate);
+    strcpy(account->currency, rate[currency-1].currency);
+    account->balance = newBalance;
+
+    printf("***\n");
+    printf("Account Name: %s, %s\n", account->lastName, account->firstName);
+    printf("New Balance: %.2f\n", account->balance);
+    printf("New Currency: %s\n\n", account->currency);
+}
+
+void depositAmount(struct Account *account, struct exchangeRate *rate) {
     float amount;
+    int currency;
     printf("Deposit Amount\n");
     printf("Account Name: %s, %s\n", account->lastName, account->firstName);
     printf("Current Balance: %.2f\n", account->balance);
     printf("Currency: %s\n\n", account->currency);
+
+    for (int i = 0; i < 6; i++) {
+        printf("[%d] %s (%s)\n", i+1, rate[i].currencyName, rate[i].currency);
+    }
+    printf("Currency to Deposit: ");
+    scanf("%d", &currency);
+
     printf("Deposit Amount: ");
     scanf("%f", &amount);
+    amount = amount * rate[currency-1].rate;
     account->balance += amount;
     printf("***\n");
     printf("Account Name: %s, %s\n", account->lastName, account->firstName);
     printf("Deposit Amount: %.2f\n", amount);
+
+
+    printf("Would you like to change account currency to this one? (Y/N): ");
+    char choice;
+    scanf(" %c", &choice);
+    if (choice == 'Y' || choice == 'y') {
+        changeAccountCurrency(account, rate, currency);
+    }
+    else
+        printf("\n***\n");
 }
 
-void withdrawAmount(struct Account *account) {
+void withdrawAmount(struct Account *account, struct exchangeRate *rate) {
     float amount;
+    int currency;
     printf("Withdraw Amount\n");
     printf("Account Name: %s, %s\n", account->lastName, account->firstName);
     printf("Current Balance: %.2f\n", account->balance);
     printf("Currency: %s\n\n", account->currency);
+
+    for (int i = 0; i < 6; i++) {
+        printf("[%d] %s (%s)\n", i+1, rate[i].currencyName, rate[i].currency);
+    }
+    printf("Currency to Withdraw: ");
+    scanf("%d", &currency);
+
     printf("Withdraw Amount: ");
     scanf("%f", &amount);
+
+    amount = amount * rate[currency-1].rate;
     account->balance -= amount;
     printf("***\n");
     printf("Account Name: %s, %s\n", account->lastName, account->firstName);
     printf("Withdraw Amount: %.2f\n", amount);
+
+    printf("Would you like to change account currency to this one? (Y/N): ");
+    char choice;
+    scanf(" %c", &choice);
+    if (choice == 'Y' || choice == 'y') {
+        changeAccountCurrency(account, rate, currency);
+    }
+    else
+        printf("\n***\n");
 }
 
 void recordExchangeRates(struct exchangeRate *rate) {
@@ -112,7 +182,35 @@ void exchangeRates(struct exchangeRate *rate) {
     printf("Source Amount (%s) %.2f\n\n", rate[0].currency, amount);
 }
 
-void menu(struct Account *acc, struct exchangeRate *rate){
+void interestRates(struct Account *account) {
+    account->interestRate = 0.05;
+    char choice;
+    do {
+        int num = 0;
+        
+        float interestAmount = account->balance * account->interestRate;
+        printf("Show Interest Amount\n");
+        printf("Account Name: %s, %s\n", account->lastName, account->firstName);
+        printf("Current Balance: %.2f\n", account->balance);
+        printf("Currency: %s\n\n", account->currency);
+        printf("Interest Rate: %.2f%%\n\n", account->interestRate * 100);
+
+
+        printf("Total Number of days: ");   
+        scanf("%d", &num);
+        float dailyInterest = interestAmount/365;
+
+        for (int day = 1; day <= num; day++) {
+            float dailybal = account->balance + (dailyInterest * day);
+            printf("%-4d | %-4.2f | %-4.2f |\n", day, dailyInterest, dailybal);
+        }
+
+        printf("\nReturn to menu? Y/N: ");
+        scanf(" %c", &choice);
+    } while (choice != 'Y' && choice != 'y');
+}
+
+int menu(struct Account *acc, struct exchangeRate *rate){
     int num;
     char c;
 
@@ -135,10 +233,10 @@ void menu(struct Account *acc, struct exchangeRate *rate){
             accountRegister(acc);
             break;
         case 2:
-            depositAmount(acc);
+            depositAmount(acc, rate);
             break;
         case 3:
-            withdrawAmount(acc);
+            withdrawAmount(acc, rate);
             break;
         case 4:
             exchangeRates(rate);
@@ -147,17 +245,22 @@ void menu(struct Account *acc, struct exchangeRate *rate){
             recordExchangeRates(rate);
             break;
         case 6:
-            printf("not implemented yet in specs.\n");
+            interestRates(acc);
             break;
+        case 7:
+            printf("Exiting program. bye bye!\n");
+            return 0;
         default:
-            printf("Error. Invalid input. Please enter a number between 1 and 6. Terminating program.\n");
+            printf("Error. Invalid input. Please enter a number between 1 and 7. Terminating program.\n");
     }
+    return 1;
 }
 
 
 int main() {
     // variables for the rest of the program
     struct Account account;
+    int menuChoice = 1;
 
     //default values, kinda ehh to make a separate file defaults for ts..
     struct exchangeRate rate[6] = {
@@ -169,6 +272,6 @@ int main() {
         {"Chinese Yuan Renminbi", "CNY", 9.00}
     };
 
-    while(1)
-        menu(&account, rate); 
+    while(menuChoice)
+        menuChoice = menu(&account, rate); 
 }
