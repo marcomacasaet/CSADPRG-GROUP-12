@@ -169,16 +169,23 @@ void recordExchangeRates(struct exchangeRate *rate) {
 
 void exchangeRates(struct exchangeRate *rate) {
     double amount;
+    int num = 0;
+    int currency = 0;
     printf("Foreign Currency Exchange\n");
-    printf("Source Amount (PHP): ");
-    scanf("%lf", &amount);
     printf("\n\n");
     for (int i = 0; i < 6; i++) {
-        printf("[%d] %s (%s) = %.2f\n", i+1, rate[i].currencyName, rate[i].currency, rate[i].rate * amount);
+        printf("[%d] %s (%s) \n", i+1, rate[i].currencyName, rate[i].currency);
     }
+    printf("Source Currency: ");
+    scanf("%d", &num);
+    printf("Source Amount: ");
+    scanf("%lf", &amount);
+    printf("Exchange Currency: ");
+    scanf("%d", &currency);
+    amount = amount * rate[num-1].rate;
+    float finalAmount = amount * rate[currency-1].rate;
+    printf("Exchange Amount: %.2f \n", finalAmount);
     printf("\n***\n");
-    printf("Source Currency: %s (%s)\n", rate[0].currencyName, rate[0].currency);
-    printf("Source Amount (%s) %.2f\n\n", rate[0].currency, amount);
 }
 
 void interestRates(struct Account *account) {
