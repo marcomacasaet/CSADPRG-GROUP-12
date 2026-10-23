@@ -23,7 +23,12 @@ fun main()
         println("[6] Show Interest Amount")
 
         print("Choice: ")
-        var choice = readln()
+        var choice = readln().trim()
+
+        if(choice == "")
+        {
+            continue
+        }
         
         println("\n**********\n")
 
@@ -102,11 +107,8 @@ class ExchangeRate()
     {
         val nam = exchangeRates[key]?.keys?.first()
         
-        println(nam)
-        
         if (nam != null)
         {
-            print(rate)
             exchangeRates[key]?.put(nam, rate)
         }
     }
@@ -130,11 +132,13 @@ class Transaction()
             println("Register Account Name")
             print("Account Name: ")
 
-            val name = readln()
+            val name = readln().trim()
             
             val sameAccount = accountList.any {it.accName == name}
-            
-            if (!sameAccount)
+            if (name.isBlank())
+            {
+                println("Cannot be blanked.")
+            } else if (!sameAccount)
             {
                 accountList.add(AccountInfo(name))
                 println("${name} is created.")
@@ -145,12 +149,12 @@ class Transaction()
             }
             
             print("\n\nBack to the Main Menu (Y/N): ")
-            choice = readln()
+            choice = readln().trim()
             
             if (choice == "Y" || choice == "y")
             {
                 isExited = !isExited
-            } else
+            } else 
             {
                 println("\n")
             }
@@ -169,7 +173,7 @@ class Transaction()
             
             println("Deposit Amount")
             print("Account Name: ")
-            val name = readln()
+            val name = readln().trim()
             
             val account = accountList.find {it.accName == name}
 
@@ -186,7 +190,13 @@ class Transaction()
                 }
 
                 print("Select Currency: ")
-                val source = readln().toInt()
+                val source = readln().toIntOrNull()
+
+                if (source == null)
+                {
+                    println("Invalid Input.\n")
+                    continue
+                }
 
                 if (source > 0 && source <= (exchangeRates.getCurrList()).count())
                 {
@@ -195,7 +205,13 @@ class Transaction()
                     println("")
 
                     print("Deposit Amount: ")
-                    val amount = readln().toDouble()
+                    val amount = readln().toDoubleOrNull()
+
+                    if (amount == null)
+                    {
+                        println("Invalid Input.\n")
+                        continue
+                    }
 
                     val exchangedAmount = (amount*convert)
                     
@@ -220,7 +236,7 @@ class Transaction()
             if (input == "Y" || input == "y")
             {
                 isExited = !isExited
-            } else
+            } else 
             {
                 println("\n")
             }
@@ -238,7 +254,7 @@ class Transaction()
         {
             println("Withdraw Amount")
             print("Account Name: ")
-            val name = readln()
+            val name = readln().trim()
 
             val account = accountList.find {it.accName == name}
 
@@ -255,7 +271,13 @@ class Transaction()
                 }
 
                 print("Select Currency: ")
-                val source = readln().toInt()
+                val source = readln().toIntOrNull()
+
+                if (source == null)
+                {
+                    println("Invalid Input.\n")
+                    continue
+                }
 
                 if (source > 0 && source <= exchangeRates.getCurrList().count())
                 {
@@ -264,7 +286,13 @@ class Transaction()
                     println("")
 
                     print("Deposit Amount: ")
-                    val amount = readln().toDouble()
+                    val amount = readln().toDoubleOrNull()
+
+                    if (amount == null)
+                    {
+                        println("Invalid Input.\n")
+                        continue
+                    }
 
                     val exchangedAmount = (amount*convert)
                 
@@ -295,7 +323,7 @@ class Transaction()
             if (input == "Y" || input == "y")
             {
                 isExited = !isExited
-            } else
+            } else 
             {
                 println("\n")
             }
@@ -322,10 +350,22 @@ class Transaction()
             println("")
             
             print("Source Currency: ")
-            val source = readln().toInt()
-            
+            val source = readln().toIntOrNull()
+
+            if (source == null)
+            {
+                println("Invalid Input.\n")
+                continue
+            }
+        
             print("Source Amount: ")
-            val amount = readln().toDouble()
+            val amount = readln().toDoubleOrNull()
+
+            if (amount == null)
+            {
+                println("Invalid Input.\n")
+                continue
+            }
             
             val curr1: String = exchangeRates.getCurrList().keys.elementAt(source-1)
             val ex1: Double = exchangeRates.getCurrRate(curr1)
@@ -343,20 +383,28 @@ class Transaction()
             println("")
             
             print("Exchange Currency: ")
-            val exchange = readln().toInt()
+            val exchange = readln().toIntOrNull()
+
+            if (exchange == null)
+            {
+                println("Invalid Input.\n")
+                continue
+            }
             
             val curr2: String = exchangeRates.getCurrList().keys.elementAt(exchange-1)
             val ex2: Double = exchangeRates.getCurrRate(curr2)
             
             println("Exchange Amount: %.2f".format((amount*ex1) / ex2))
+
+            println("\n%.2f $curr1 == %.2f $curr2".format(amount, (amount*ex1) / ex2))
             
             print("\n\nConvert another currency (Y/N)? ")
-            input = readln()
+            input = readln().trim()
             
             if (input == "N" || input == "n")
             {
                 isExited = !isExited
-            } else
+            } else 
             {
                 println("\n")
             }
@@ -382,19 +430,29 @@ class Transaction()
             println("")
             
             print("Select Foreign Currency: ")
-            val choice = readln().toInt()
+            val choice = readln().toIntOrNull()
+
+            if (choice == null)
+            {
+                println("Invalid Input.\n")
+                continue
+            }
             print("Exchange Rate: ")
-            val rate = readln().toDouble()
+            val rate = readln().toDoubleOrNull()
+
+            if (rate == null)
+            {
+                println("Invalid Input.\n")
+                continue
+            }
             
             val curr: String = exchangeRates.getCurrList().keys.elementAt(choice-1)
             exchangeRates.setCurrRate(curr, rate)
             
-            println("\n***")
-            println("Select Foreign Currency = [$choice]")
-            println("Exchange Rate = %.2f".format(rate))    
+            println("\n$curr == %.2f".format(rate))
         
             print("\n\nBack to the Main Menu (Y/N): ")
-            input = readln()
+            input = readln().trim()
             
             if (input == "Y" || input == "y")
             {
@@ -417,7 +475,7 @@ class Transaction()
             println("Show Interest Amount")
             print("Account Name: ")
             
-            val name = readln()
+            val name = readln().trim()
             
             val account = accountList.find {it.accName == name}
 
@@ -428,9 +486,15 @@ class Transaction()
                 println("Interest Rate: 5%")
                 
                 print("Total Number of Days: ")
-                val input = readln().split(" ") // Splits into max 2 parts
+                val input = readln().trim().split(" ") // Splits into max 2 parts
         
-                val number = input[0].toInt()
+                val number = input[0].toIntOrNull()
+
+                if (number == null)
+                {
+                    println("Invalid Input.\n\n")
+                    continue
+                }
                 
                 var last = account.accBalance
                 var interest: Double
@@ -447,11 +511,10 @@ class Transaction()
             } else
             {
                 println("${name} does not exist.")
-                isExited = !isExited
             }  
         
             print("\n\nBack to the Main Menu (Y/N): ")
-            input = readln()
+            input = readln().trim()
             
             if (input == "Y" || input == "y")
             {
