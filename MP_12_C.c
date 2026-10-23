@@ -74,7 +74,6 @@ void changeAccountCurrency(struct Account *account, struct exchangeRate *rate, i
             break;
         }
     }
-
     
     newBalance = account->balance * (currentRate / rate[currency-1].rate);
     strcpy(account->currency, rate[currency-1].currency);
