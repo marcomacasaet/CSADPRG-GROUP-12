@@ -764,7 +764,7 @@ public class Main {
 
         Map<LocalDate, Float> endOfDayBalances = new HashMap<>();
         for (Transactions transaction : listTransactions) {
-            LocalDate tDate = transaction.getDate(); // if LocalDateTime, use transaction.getDate().toLocalDate()
+            LocalDate tDate = transaction.getDate(); 
             if (transaction.getAccountNo() == account.getNumber() && !tDate.isBefore(monthStart) && !tDate.isAfter(monthEnd)) {
                 endOfDayBalances.put(tDate, (float)transaction.balanceAfterTransaction());
             }
