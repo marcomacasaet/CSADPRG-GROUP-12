@@ -1,30 +1,30 @@
 public class Interest {
     
-    double rate;
-    double time;
+    float rate;
+    int time;
 
-    Interest(double rate, double time){
-        this.rate = rate;
-        this.time = time;
+    Interest(){
+        this.rate = 0.05f;
+        this.time = 0;
     }
 
-    public void setIntRate(double rate){
+    public void setIntRate(float rate){
         this.rate = rate;
     }
 
-    public double getIntRate(){
+    public float getIntRate(){
         return this.rate;
     }
 
-    public void setTime(double time){
+    public void setTime(int time){
         this.time = time;
     }
 
-    public double getTime(){
+    public float getTime(){
         return this.time;
     }
 
-    public double getDaily(double rate, double bal){
+    public float getDaily(float rate, float bal){
         return bal*(rate/365);
     }
 }
