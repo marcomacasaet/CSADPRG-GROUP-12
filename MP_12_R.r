@@ -629,7 +629,7 @@ make_report3 <- function(data) {
   # otherwise 100 (money went out with nothing coming in). Change the 100 if needed.
   r$TurnoverVelocity <- ifelse(r$TotalDepositAmounts > 0,
                                r$TotalWithdrawalAmounts / r$TotalDepositAmounts * 100,
-                               ifelse(r$TotalWithdrawalAmounts > 0, 100, 0))
+                               0)
 
   # RiskFlagLevel
   r$RiskFlagLevel <- ifelse(r$TotalWithdrawalAmounts >= 500000 | r$TurnoverVelocity >= 90,
