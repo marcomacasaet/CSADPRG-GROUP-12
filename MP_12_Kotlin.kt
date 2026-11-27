@@ -13,6 +13,8 @@ fun main()
 {
     
     val transaction = Transaction()
+
+    transaction.readCSV()
     
     while (true)
     {
@@ -252,8 +254,6 @@ class Transaction()
     {
         var isExited: Boolean = false
         var choice: String
-
-        readCSV()
         
         while (!isExited)
         {
@@ -767,6 +767,13 @@ class Transaction()
             var endDate: String = ""
             var endTime: String = ""
 
+            val today = generateDate()
+            val todayParts = today[0].split('/')
+
+            var prevDate: String = ""
+            var prevCurr = 0.0
+
+            var skip: Boolean = true
             var first: Boolean = true
             for (index in user.value)
             {
@@ -780,12 +787,38 @@ class Transaction()
                 endDate = transactionsList.get(index).recordDate
                 endTime = transactionsList.get(index).recordTime
 
-                sum += transactionsList.get(index).recordBalance
-                num += 1.0
-
-                curr = transactionsList.get(index).recordBalance
+                var datee = endDate.split('/')
                 
+                curr = transactionsList.get(index).recordBalance
+
+                if (todayParts[1].toInt()-1 == datee[1].toInt() && todayParts[2].toInt() == datee[2].toInt())
+                {
+                    
+                    if (!skip)
+                    {
+                        var dayDiff = getDaysDifference(prevDate, "00:00:00", endDate, endTime)
+                        
+                        if (dayDiff > 0)
+                        {
+                            sum += (prevCurr * dayDiff)
+                            num += dayDiff
+                        }
+                    }
+    
+                    prevCurr = curr
+                    
+                    skip = false
+                    prevDate = endDate
+                }
+
             }
+
+            val endend = "01/${todayParts[1]}/${todayParts[2]}"
+
+            val diff = getDaysDifference(prevDate, "00:00:00", endend, "00:00:00")
+
+            sum += (prevCurr * (diff+1))
+            num += diff+1
 
             val average = sum/num
 
@@ -803,12 +836,15 @@ class Transaction()
 
             val age = getDaysDifference(startDate, startTime, endDate, endTime)
 
-            records.add(listOf(user.key, "%,d".format(age), "%,.2f".format(curr), "%,.2f".format(average), tier))
+            if (average >= 100000.0)
+            {
+                records.add(listOf(user.key, "%,d".format(age), "%,.2f".format(curr), "%,.2f".format(average), tier))
+            }
             
             totalAcc += 1
         }
 
-        records.sortByDescending { it[3] }
+        records.sortByDescending { it[3].replace(",", "").toDouble() }
 
         println("%20s | %20s | %20s | %20s | %20s".format("AccountName", "AccountAge", "CurrentBalance", "AverageDailyBalance", "PrivilegeTier"))
         println("%20s | %20s | %20s | %20s | %20s".format(records[0][0], records[0][1], records[0][2], records[0][3], records[0][4]))
@@ -840,20 +876,28 @@ class Transaction()
 
             var last = acc.accBalance
             var interest: Double
+
+            var totalInterest: Double = 0.0
+
             for (i in 1..30)
             {
                 interest = last * (0.05/365)
                 last += interest
+
+                totalInterest += interest
             }
 
-            records.add(listOf(user, "%,.2f".format(curr), "%,.2f".format(last)))
+            if (curr >= 10000.00)
+            {
+                records.add(listOf(user, "%,.2f".format(curr), "%,.2f".format(totalInterest)))
+            }
 
             totalBal += curr
             totalInt += last
 
         }
 
-        records.sortByDescending { it[2] }
+        records.sortByDescending { it[2].replace(",", "").toDouble() }
 
         println("%20s | %20s | %20s ".format("AccountName", "CurrentBalance", "ExpectedInterest"))
         println("%20s | %20s | %20s ".format(records[0][0], records[0][1], records[0][2]))
